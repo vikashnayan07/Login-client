@@ -38,9 +38,9 @@ export default function Profile() {
       <div className="flex justify-center items-center h-fit py-5">
         <div className={styles.glass} style={{ width: "20%" }}>
           <div className="title flex flex-col items-center">
-            <h4 className="text-5xl font-bold">Signup User</h4>
+            <h4 className="text-5xl font-bold">User Profile</h4>
             <span className="py-4 text-xl w-fit text-center text-gray-500">
-              Happy to connect you!
+              you can update profile here!
             </span>
           </div>
 
