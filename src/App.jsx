@@ -1,12 +1,24 @@
-import { useState } from "react";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import React from "react";
+import Username from "./component/Username";
+import Signup from "./component/Signup";
 
-import "./App.css";
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <Username />,
+  },
+  {
+    path: "/signup",
+    element: <Signup />,
+  },
+]);
 
 function App() {
   return (
-    <>
-      <h1 className=" bg-slate-600">React app</h1>
-    </>
+    <main>
+      <RouterProvider router={router}></RouterProvider>
+    </main>
   );
 }
 
