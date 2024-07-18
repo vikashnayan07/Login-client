@@ -1,26 +1,32 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import styles from "../styles/Username.module.css";
 import { useFormik } from "formik";
 import { usernameValidate } from "../helper/validate";
 import { Toaster } from "react-hot-toast";
+import useAuthStore from "../store/store";
+import { useEffect } from "react";
 
 export default function Username() {
+  const setUsername = useAuthStore((state) => state.setUsername);
+  const navigate = useNavigate();
+
   const formik = useFormik({
     initialValues: {
-      username: "",
+      username: "example",
     },
     validate: usernameValidate,
     validateOnBlur: false,
     validateOnChange: false,
     onSubmit: async (values) => {
-      console.log(values);
+      setUsername(values.username);
+      navigate("/password");
     },
   });
 
   return (
     <div className="container mx-auto">
       <Toaster />
-      <div className="flex justify-center items-center h-full py-5">
+      <div className="flex justify-center items-center h-screen py-5">
         <div className={styles.glass}>
           <div className="title flex flex-col items-center">
             <h4 className="text-5xl font-bold">Hello Again!</h4>

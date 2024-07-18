@@ -1,22 +1,58 @@
-import { Link } from "react-router-dom";
-import styles from "../styles/Username.module.css";
 import { useFormik } from "formik";
-import { Toaster } from "react-hot-toast";
+import styles from "../styles/Username.module.css";
+import toast, { Toaster } from "react-hot-toast";
 import { resetPasswordValidate } from "../helper/validate";
+import { resetPassword } from "../helper/helper";
+import { useNavigate } from "react-router-dom";
+import useFetchData from "../hooks/fetch.hook";
+import { useEffect } from "react";
 
 export default function Reset() {
+  const navigate = useNavigate();
+  const [{ isLoading, apiData, status, serverError }] =
+    useFetchData("createResetsession");
+
+  useEffect(() => {
+    if (serverError) {
+      console.error("Server Error in Reset Component:", serverError);
+    }
+  }, [serverError]);
+
   const formik = useFormik({
     initialValues: {
-      password: "",
-      confirmPassword: "",
+      password: "Testpassword9@",
+      confirmPassword: "Testpassword9@",
     },
     validate: resetPasswordValidate,
     validateOnBlur: false,
     validateOnChange: false,
     onSubmit: async (values) => {
-      console.log(values);
+      let resetPasswordPromise = resetPassword({
+        username: apiData?.username,
+        password: values.password,
+      });
+
+      toast.promise(resetPasswordPromise, {
+        loading: "Updating...",
+        success: <b>Reset Successfully</b>,
+        error: <b>Couldn't Reset Password</b>,
+      });
+
+      resetPasswordPromise
+        .then(() => {
+          navigate("/password");
+        })
+        .catch((error) => {
+          console.error("Error in Reset Password Promise:", error);
+        });
     },
   });
+
+  if (isLoading) return <h1 className="text-2xl font-bold">Loading...</h1>;
+  if (serverError)
+    return <h1 className="text-xl text-red-500">{serverError.message}</h1>;
+  if (status && status !== 201)
+    return <Navigate to={"/password"} replace={true} />;
 
   return (
     <div className="container mx-auto">
@@ -35,17 +71,17 @@ export default function Reset() {
               <input
                 {...formik.getFieldProps("password")}
                 className={styles.textbox}
-                type="text"
+                type="password"
                 placeholder="Password"
               />
               <input
                 {...formik.getFieldProps("confirmPassword")}
                 className={styles.textbox}
-                type="text"
+                type="password"
                 placeholder="Confirm password"
               />
               <button className={styles.btn} type="submit">
-                Sumbit
+                Submit
               </button>
             </div>
           </form>

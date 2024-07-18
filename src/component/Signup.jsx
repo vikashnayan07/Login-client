@@ -1,12 +1,14 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import styles from "../styles/Username.module.css";
 import { useFormik } from "formik";
-import { Toaster } from "react-hot-toast";
+import toast, { Toaster } from "react-hot-toast";
 import { signUpValidation } from "../helper/validate";
 import { useState } from "react";
 import convertToBase from "../helper/convert";
+import { registerUser } from "../helper/helper";
 
 export default function Password() {
+  const navigate = useNavigate();
   const [file, setFile] = useState();
   const formik = useFormik({
     initialValues: {
@@ -19,7 +21,15 @@ export default function Password() {
     validateOnChange: false,
     onSubmit: async (values) => {
       values = await Object.assign(values, { profile: file || "" });
-      console.log(values);
+      const registerPRomise = registerUser(values);
+      toast.promise(registerPRomise, {
+        loading: "Creating...",
+        success: <b>Register successfully...</b>,
+        error: <b>Could not register</b>,
+      });
+      registerPRomise.then(function () {
+        navigate("/");
+      });
     },
   });
 

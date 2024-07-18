@@ -1,25 +1,41 @@
-import { Link } from "react-router-dom";
-import styles from "../styles/Username.module.css";
+import { Link, useNavigate } from "react-router-dom";
+import styles from "../styles/Password.module.css";
 import { useFormik } from "formik";
-import { Toaster } from "react-hot-toast";
-import { signUpValidation } from "../helper/validate";
+import toast, { Toaster } from "react-hot-toast";
+import { profileValidation } from "../helper/validate";
 import { useState } from "react";
 import convertToBase from "../helper/convert";
+import useFetchData from "../hooks/fetch.hook";
+import { updateUserProfile } from "../helper/helper";
 
 export default function Profile() {
   const [file, setFile] = useState();
+  const navigate = useNavigate();
+
+  const [{ isLoading, apiData, serverError }] = useFetchData();
+
   const formik = useFormik({
     initialValues: {
-      username: "vikash",
-      email: "vikashnayan@gmail.com",
-      password: "Vikash94304@",
+      firstName: apiData?.firstName || "",
+      lastName: apiData?.lastName || "",
+      email: apiData?.email || "",
+      mobile: apiData?.mobile || "",
+      address: apiData?.address || "",
     },
-    validate: signUpValidation,
+    enableReinitialize: true,
+    validate: profileValidation,
     validateOnBlur: false,
     validateOnChange: false,
     onSubmit: async (values) => {
-      values = await Object.assign(values, { profile: file || "" });
-      console.log(values);
+      values = await Object.assign(values, {
+        profile: file || apiData?.profile || "",
+      });
+      let profileUpdate = updateUserProfile(values);
+      toast.promise(profileUpdate, {
+        loading: "Updating...",
+        success: <b>Update Successfully...</b>,
+        error: <b>Could not Update...</b>,
+      });
     },
   });
 
@@ -32,11 +48,20 @@ export default function Profile() {
     }
   };
 
+  //remove token
+  function useLogout() {
+    localStorage.removeItem("token");
+    navigate("/");
+  }
+  if (isLoading) return <h1 className="text-2xl font-bold">Loading...</h1>;
+  if (serverError)
+    return <h1 className="text-xl text-red-500">{serverError.message}</h1>;
+
   return (
     <div className="container mx-auto">
       <Toaster />
       <div className="flex justify-center items-center h-fit py-5">
-        <div className={styles.glass} style={{ width: "20%" }}>
+        <div className={styles.glass} style={{ width: "35%" }}>
           <div className="title flex flex-col items-center">
             <h4 className="text-5xl font-bold">User Profile</h4>
             <span className="py-4 text-xl w-fit text-center text-gray-500">
@@ -49,6 +74,7 @@ export default function Profile() {
               <label htmlFor="profile">
                 <img
                   src={
+                    apiData?.profile ||
                     file ||
                     "https://avatars.githubusercontent.com/u/115102517?s=400&u=53c0465f218c35139b958f1f1f99934e4f7a3f67&v=4"
                   }
@@ -101,14 +127,16 @@ export default function Profile() {
               />
 
               <button className={styles.btn} type="submit">
-                Signup
+                Update
               </button>
             </div>
 
             <div className="text-center py-4">
               <span className="text-gray-500">
                 Come back again?{" "}
-                <button className="text-red-500">Logout</button>
+                <button onClick={useLogout} className="text-red-500">
+                  Logout
+                </button>
               </span>
             </div>
           </form>

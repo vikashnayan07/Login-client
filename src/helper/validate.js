@@ -1,7 +1,15 @@
 import toast from "react-hot-toast";
+import { authenticate } from "./helper";
 
 export async function usernameValidate(values) {
   const errors = usernameVerify({}, values);
+  if (values.username) {
+    const { status } = await authenticate(values.username);
+    if (status !== 200) {
+      errors.exist = toast.error("Username not found..");
+    }
+  }
+
   return errors;
 }
 export async function resetPasswordValidate(values) {
@@ -21,6 +29,10 @@ export async function signUpValidation(values) {
   const errors = usernameVerify({}, values);
   passwordVerify(errors, values);
   emailVerify(errors, values);
+  return errors;
+}
+export async function profileValidation(values) {
+  const errors = emailVerify({}, values);
   return errors;
 }
 
