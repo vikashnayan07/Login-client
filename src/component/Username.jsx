@@ -7,7 +7,7 @@ import useAuthStore from "../store/store";
 import { useEffect } from "react";
 
 export default function Username() {
-  const setUsername = useAuthStore((state) => state.setUsername);
+  useAuthStore((state) => state.setUsername);
   const navigate = useNavigate();
 
   const formik = useFormik({

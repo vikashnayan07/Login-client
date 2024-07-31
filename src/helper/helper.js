@@ -3,7 +3,6 @@ import { jwtDecode } from "jwt-decode";
 
 axios.defaults.baseURL = "http://localhost:3000";
 
-// Function to get the username from the token
 export async function getUsername() {
   const token = localStorage.getItem("token");
   if (!token) return Promise.reject("Couldn't find token");
@@ -117,10 +116,10 @@ export async function resetPassword({ username, password }) {
       username,
       password,
     });
-    console.log("API Response:", response); // Log the full response for debugging
+    console.log("API Response:", response);
 
     if (response.status === 200) {
-      return response.data; // Return the data on success
+      return response.data;
     } else {
       throw new Error(`Unexpected status code: ${response.status}`);
     }
